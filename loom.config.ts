@@ -16,7 +16,19 @@ export default createWorkspace((workspace) => {
       });
 
       tasks.build.hook(({hooks}) => {
-        hooks.pre.hook((steps) => [...steps, createGraphQLTypeScriptStep()]);
+        hooks.pre.hook((steps) => [
+          ...steps.map((step) => {
+            if (step.id !== 'Typescript') return step;
+
+            return {
+              ...step,
+              needs: (otherStep) =>
+                otherStep.id === 'Quilt.TypeScriptGraphQL' ||
+                (step.needs?.(otherStep) ?? false),
+            };
+          }),
+          createGraphQLTypeScriptStep(),
+        ]);
       });
 
       tasks.test.hook(({hooks}) => {
