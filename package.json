@@ -12,8 +12,11 @@
   "scripts": {
     "test": "loom test",
     "lint": "loom lint",
+    "pretype-check": "yarn graphql-typescript-definitions",
     "type-check": "loom type-check",
-    "build": "loom build"
+    "prebuild": "yarn graphql-typescript-definitions",
+    "build": "loom build",
+    "graphql-typescript-definitions": "node --experimental-vm-modules node_modules/@quilted/graphql/bin/quilt-graphql-typescript.mjs"
   },
   "devDependencies": {
     "@changesets/changelog-github": "^0.4.5",
