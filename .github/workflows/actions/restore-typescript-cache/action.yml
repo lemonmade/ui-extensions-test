@@ -1,0 +1,12 @@
+name: Restore TypeScript cache
+runs:
+  using: 'composite'
+  steps:
+    - uses: actions/cache@v2
+      with:
+        path: |
+          packages/*/build/typescript
+          packages/*/build/*.tsbuildinfo
+        key: ${{ runner.os }}-typescript-v1-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-typescript-v1-

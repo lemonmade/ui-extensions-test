@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - '**'
+      - '!main'
+  workflow_call:
+
+jobs:
+  lint:
+    name: Lint 💅
+    runs-on: self-hosted
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/workflows/actions/prepare
+      - run: yarn lint
+
+  type-check:
+    name: Type check 🧮
+    runs-on: self-hosted
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/workflows/actions/prepare
+      - uses: ./.github/workflows/actions/restore-typescript-cache
+      - run: yarn type-check
+
+  unit-tests:
+    name: Unit tests 🧪
+    runs-on: self-hosted
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/workflows/actions/prepare
+      - run: yarn test
+
+  e2e-tests:
+    name: End-to-end tests 🔬
+    runs-on: self-hosted
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/workflows/actions/prepare
+      - uses: ./.github/workflows/actions/restore-typescript-cache
+      - run: yarn build
