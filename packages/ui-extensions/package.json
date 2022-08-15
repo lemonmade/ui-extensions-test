@@ -1,6 +1,6 @@
 {
   "name": "@shopilemon/ui-extensions",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "publishConfig": {
     "access": "public",
     "@shopilemon:registry": "https://registry.npmjs.org"
@@ -9,6 +9,16 @@
   "module": "index.mjs",
   "esnext": "index.esnext",
   "types": "./build/typescript/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "admin": [
+        "./build/typescript/surfaces/admin/index.d.ts"
+      ],
+      "checkout": [
+        "./build/typescript/surfaces/checkout/index.d.ts"
+      ]
+    }
+  },
   "exports": {
     ".": {
       "esnext": "./index.esnext",
