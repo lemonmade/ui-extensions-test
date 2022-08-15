@@ -1,0 +1,72 @@
+scalar Url
+scalar Date
+scalar Version
+scalar ExtensionPoint
+scalar ExtensionApiVersion
+
+type Asset {
+  source: Url!
+}
+
+type BuildError {
+  message: String!
+  stack: String
+}
+
+type ExtensionBuildInProgress {
+  id: ID!
+  startedAt: Date!
+}
+
+type ExtensionBuildSuccess {
+  id: ID!
+  finishedAt: Date!
+  startedAt: Date!
+  duration: Int!
+  assets: [Asset!]!
+}
+
+type ExtensionBuildError {
+  id: ID!
+  error: BuildError!
+  finishedAt: Date!
+  duration: Int!
+  startedAt: Date!
+}
+
+union ExtensionBuild =
+    ExtensionBuildInProgress
+  | ExtensionBuildSuccess
+  | ExtensionBuildError
+
+type ExtensionPointSupport {
+  target: ExtensionPoint!
+  module: String!
+}
+
+type Extension {
+  id: ID!
+  name: String!
+  handle: String!
+  build: ExtensionBuild
+  extends: [ExtensionPointSupport!]!
+}
+
+type App {
+  extensions: [Extension!]!
+  extension(id: ID!): Extension
+}
+
+type Api {
+  version: Version!
+  websocketUrl: Url!
+}
+
+type Query {
+  api: Api!
+  app: App!
+}
+
+schema {
+  query: Query
+}

@@ -9,8 +9,16 @@ export default createWorkspace((workspace) => {
   workspace.use(
     buildLibraryWorkspace(),
     eslint(),
-    prettier({files: '**/*.{md,json,yaml,yml}'}),
-    createWorkspacePlugin('UiExtensions.WorkspaceHacks', ({tasks}) => {
+    prettier({files: '**/*.{md,json,yaml,yml,graphql}'}),
+    createWorkspacePlugin('UiExtensions.WorkspaceHacks', ({tasks, api}) => {
+      tasks.typeCheck.hook(({hooks}) => {
+        hooks.pre.hook((steps) => [...steps, createGraphQLTypeScriptStep()]);
+      });
+
+      tasks.build.hook(({hooks}) => {
+        hooks.pre.hook((steps) => [...steps, createGraphQLTypeScriptStep()]);
+      });
+
       tasks.test.hook(({hooks}) => {
         hooks.configure.hook(({jestFlags}) => {
           // We currently have no tests, this forces Jest to pass anyways
@@ -20,6 +28,20 @@ export default createWorkspace((workspace) => {
           }));
         });
       });
+
+      function createGraphQLTypeScriptStep() {
+        return api.createStep(
+          {
+            id: 'Quilt.TypeScriptGraphQL',
+            label: 'GraphQL TypeScript definitions',
+          },
+          async (step) => {
+            await step.exec('node_modules/.bin/quilt-graphql-typescript', [], {
+              stdio: 'inherit',
+            });
+          },
+        );
+      }
     }),
   );
 });

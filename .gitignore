@@ -2,10 +2,12 @@ node_modules
 .loom
 .DS_STORE
 packages/*/build
+packages/*/bin
 packages/*/*.esnext
 packages/*/*.node
 packages/*/*.mjs
 packages/*/*.d.ts
 packages/*/*.js
 !packages/*/.eslintrc.js
+packages/cli/src/commands/develop/schema.ts
 *.log

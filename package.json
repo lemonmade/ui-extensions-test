@@ -27,9 +27,13 @@
     "@shopify/loom-plugin-prettier": "^2.0.0",
     "@shopify/browserslist-config": "^3.0.0",
     "@shopify/typescript-configs": "^5.1.0",
+    "@quilted/graphql": "^0.4.44",
     "eslint": "^8.7.0",
     "prettier": "^2.5.0",
     "typescript": "^4.7.0"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "resolutions": {
+    "@graphql-tools/schema": "9.0.1"
+  }
 }
