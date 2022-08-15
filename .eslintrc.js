@@ -16,10 +16,14 @@ module.exports = {
     'packages/*/*.mjs',
     'packages/*/*.node',
     'packages/*/*.esnext',
+    'packages/cli/src/commands/develop/schema.ts',
+    '*.graphql',
   ],
   rules: {
     // Shopify naming rules are too strict
     '@typescript-eslint/naming-convention': 'off',
+    'import/order': 'off',
+    '@typescript-eslint/array-type': 'off',
   },
   overrides: [
     {

@@ -14,6 +14,16 @@
       "esnext": "./index.esnext",
       "import": "./index.mjs",
       "require": "./index.js"
+    },
+    "./admin": {
+      "esnext": "./admin.esnext",
+      "import": "./admin.mjs",
+      "require": "./admin.js"
+    },
+    "./checkout": {
+      "esnext": "./checkout.esnext",
+      "import": "./checkout.mjs",
+      "require": "./checkout.js"
     }
   },
   "sideEffects": false,

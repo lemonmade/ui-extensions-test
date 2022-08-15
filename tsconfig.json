@@ -1,5 +1,8 @@
 {
   "files": [],
   "include": [],
-  "references": [{"path": "./packages/ui-extensions"}]
+  "references": [
+    {"path": "./packages/cli"},
+    {"path": "./packages/ui-extensions"}
+  ]
 }
