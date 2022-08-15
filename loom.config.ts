@@ -36,7 +36,7 @@ export default createWorkspace((workspace) => {
             label: 'GraphQL TypeScript definitions',
           },
           async (step) => {
-            await step.exec('node_modules/.bin/quilt-graphql-typescript', [], {
+            await step.exec('yarn', ['quilt-graphql-typescript'], {
               stdio: 'inherit',
             });
           },
