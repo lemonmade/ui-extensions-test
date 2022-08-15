@@ -9,7 +9,7 @@ export default createWorkspace((workspace) => {
   workspace.use(
     buildLibraryWorkspace(),
     eslint(),
-    prettier({files: '**/*.{md,json,yaml,yml,graphql}'}),
+    prettier({files: '**/*.{md,json,yaml,yml}'}),
     createWorkspacePlugin('UiExtensions.WorkspaceHacks', ({tasks, api}) => {
       tasks.typeCheck.hook(({hooks}) => {
         hooks.pre.hook((steps) => [...steps, createGraphQLTypeScriptStep()]);
@@ -36,9 +36,16 @@ export default createWorkspace((workspace) => {
             label: 'GraphQL TypeScript definitions',
           },
           async (step) => {
-            await step.exec('yarn', ['quilt-graphql-typescript'], {
-              stdio: 'inherit',
-            });
+            await step.exec(
+              'node',
+              [
+                '--experimental-vm-modules',
+                'node_modules/@quilted/graphql/bin/quilt-graphql-typescript.mjs',
+              ],
+              {
+                stdio: 'inherit',
+              },
+            );
           },
         );
       }
