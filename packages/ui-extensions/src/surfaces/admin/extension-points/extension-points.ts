@@ -1,4 +1,4 @@
-import type {RemoteComponent} from '@remote-ui/core';
+import type {RemoteComponentType} from '@remote-ui/core';
 
 import type {RenderExtension} from '../../../extension';
 
@@ -21,7 +21,8 @@ export type {StandardApi};
 type ComponentTypes = typeof import('../../../components');
 
 export type Components = {
-  [K in keyof ComponentTypes]: ComponentTypes[K] extends RemoteComponent<
+  [K in keyof ComponentTypes]: ComponentTypes[K] extends RemoteComponentType<
+    any,
     any,
     any
   >
