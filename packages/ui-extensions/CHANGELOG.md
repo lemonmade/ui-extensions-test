@@ -1,5 +1,11 @@
 # @shopilemon/ui-extensions
 
+## 0.1.1
+
+### Patch Changes
+
+- [`4935445`](https://github.com/lemonmade/ui-extensions-test/commit/49354453175661940b65a589136fa05c04bc5a6a) Thanks [@lemonmade](https://github.com/lemonmade)! - Fix component types
+
 ## 0.0.1
 
 ### Patch Changes
