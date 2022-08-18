@@ -1,6 +1,6 @@
 {
   "name": "@shopilemon/cli",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "publishConfig": {
     "access": "public",
     "@shopilemon:registry": "https://registry.npmjs.org"
@@ -22,6 +22,7 @@
     "@iarna/toml": "^2.2.0",
     "@lemonmade/graphql-live": "^0.1.10",
     "@quilted/http-handlers": "^0.2.43",
+    "@quilted/events": "^0.1.8",
     "@quilted/threads": "^0.1.6",
     "@quilted/polyfills": "^0.2.30",
     "@rollup/plugin-commonjs": "^22.0.2",

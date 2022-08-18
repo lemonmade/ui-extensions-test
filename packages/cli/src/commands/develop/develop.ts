@@ -15,7 +15,7 @@ import {
 } from '@quilted/http-handlers';
 import {createHttpServer} from '@quilted/http-handlers/node';
 
-import WebSocket from 'ws';
+import * as WebSocket from 'ws';
 import mime from 'mime';
 import open from 'open';
 
@@ -178,7 +178,7 @@ async function createDevServer(app: LocalApp, {ui}: {ui: Ui}) {
 
   const httpServer = createHttpServer(handler);
   const stopListening = makeStoppableServer(httpServer);
-  let webSocketServer: WebSocket.Server | undefined;
+  let webSocketServer: WebSocket.WebSocketServer | undefined;
 
   return {
     async listen() {
@@ -197,7 +197,7 @@ function createWebSocketServer(
   httpServer: Server,
   {resolver}: {resolver: ReturnType<typeof createQueryResolver>},
 ) {
-  const webSocketServer = new WebSocket.Server({
+  const webSocketServer = new WebSocket.WebSocketServer({
     server: httpServer,
     path: '/connect',
   });
@@ -335,7 +335,7 @@ async function createBuilder(
   }
 }
 
-function threadTargetFromWebSocket(socket: WebSocket): ThreadTarget {
+function threadTargetFromWebSocket(socket: WebSocket.WebSocket): ThreadTarget {
   return {
     send(message) {
       socket.send(JSON.stringify(message));

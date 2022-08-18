@@ -38,7 +38,7 @@ export async function createRollupConfiguration(
 
               ${extension.extends
                 .map((extensionPoint, index) => {
-                  return `clips.register(${JSON.stringify(
+                  return `shopify.extend(${JSON.stringify(
                     extensionPoint.target,
                   )}, extension${index});`;
                 })
@@ -86,7 +86,7 @@ function minifyChunkWithESBuild(): Plugin {
 
       const result = await transform(code, {
         loader: 'js',
-        minify: true,
+        minify: false,
         // target: '',
       });
 

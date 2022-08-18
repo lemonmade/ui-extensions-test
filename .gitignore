@@ -2,7 +2,6 @@ node_modules
 .loom
 .DS_STORE
 packages/*/build
-packages/*/bin
 packages/*/*.esnext
 packages/*/*.node
 packages/*/*.mjs

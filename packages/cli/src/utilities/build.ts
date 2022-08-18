@@ -3,7 +3,7 @@ import {mkdir, writeFile} from 'fs/promises';
 import type {LocalApp, LocalExtension} from './app';
 
 export function rootOutputDirectory(app: LocalApp) {
-  return path.join(app.root, '.watch');
+  return path.join(app.root, '.shopify');
 }
 
 export async function ensureRootOutputDirectory(app: LocalApp) {
@@ -23,7 +23,7 @@ export function buildDetailsForExtension(
   app: LocalApp,
 ) {
   return {
-    filename: `${extension.id}.js`,
+    filename: `${extension.handle}.js`,
     directory: path.join(rootOutputDirectory(app), 'build/extensions'),
   };
 }
