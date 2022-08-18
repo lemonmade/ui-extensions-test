@@ -1,5 +1,5 @@
 import * as path from 'path';
-import {readFile, stat} from 'fs/promises';
+import {readFile, access} from 'fs/promises';
 import {watch} from 'chokidar';
 import type {FSWatcher} from 'chokidar';
 import {createEmitter} from '@quilted/events';
@@ -16,19 +16,13 @@ export interface LocalConfigurationFile<T> {
 }
 
 export interface LocalAppConfiguration {
-  readonly id?: string;
-  readonly name: string;
-  readonly handle: string;
   readonly extensions?: string | readonly string[];
 }
 
 export interface LocalApp {
-  readonly id: string;
-  readonly name: string;
-  readonly handle: string;
   readonly root: string;
   readonly extensions: readonly LocalExtension[];
-  readonly configurationFile: LocalConfigurationFile<LocalAppConfiguration>;
+  readonly configurationFile?: LocalConfigurationFile<LocalAppConfiguration>;
   readonly on: Emitter<{change: Omit<LocalApp, 'on'>}>['on'];
 }
 
@@ -114,42 +108,12 @@ interface LocalExtensionEntry {
 }
 
 export async function loadLocalApp(): Promise<LocalApp> {
-  const configurationPath = path.resolve('app.toml');
-  const configuration = await tryLoad<Partial<LocalAppConfiguration>>(
-    configurationPath,
-  );
-
-  validateAppConfig(configuration);
-
-  let currentApp: Omit<LocalApp, 'on'> = {
-    id:
-      configuration.id ??
-      `gid://watch/LocalApp/${configuration.name
-        .toLocaleLowerCase()
-        .replace(/\s+/g, '-')}`,
-    name: configuration.name,
-    handle: configuration.handle,
-    root: path.resolve(),
-    extensions: await resolveExtensions(configuration.extensions),
-    configurationFile: {
-      path: configurationPath,
-      value: configuration,
-    },
-  };
+  let currentApp: Omit<LocalApp, 'on'> = await loadAppFromFileSystem();
 
   let watcher: FSWatcher;
   const emitter = createEmitter<{change: Omit<LocalApp, 'on'>}>();
 
   return {
-    get id() {
-      return currentApp.id;
-    },
-    get name() {
-      return currentApp.name;
-    },
-    get handle() {
-      return currentApp.handle;
-    },
     get root() {
       return currentApp.root;
     },
@@ -165,7 +129,9 @@ export async function loadLocalApp(): Promise<LocalApp> {
         (() => {
           const fsWatcher = watch(
             [
-              configurationPath,
+              ...(currentApp.configurationFile
+                ? [currentApp.configurationFile.path]
+                : []),
               ...currentApp.extensions.map(
                 (extension) => extension.configurationFile.path,
               ),
@@ -188,31 +154,36 @@ export async function loadLocalApp(): Promise<LocalApp> {
 }
 
 async function loadAppFromFileSystem(): Promise<Omit<LocalApp, 'on'>> {
-  const configurationPath = path.resolve('app.toml');
+  const configurationPath = path.resolve('shopify.app.toml');
   const configuration = await tryLoad<Partial<LocalAppConfiguration>>(
     configurationPath,
   );
 
-  validateAppConfig(configuration);
+  if (configuration != null) {
+    validateAppConfig(configuration);
+  }
 
   return {
-    id: configuration.id ?? `gid://watch/LocalApp/1`,
-    name: configuration.name,
-    handle: configuration.handle,
     root: path.resolve(),
-    extensions: await resolveExtensions(configuration.extensions),
-    configurationFile: {
-      path: configurationPath,
-      value: configuration,
-    },
+    extensions: await resolveExtensions(
+      configuration?.extensions ?? 'extensions/*',
+    ),
+    configurationFile: configuration
+      ? {
+          path: configurationPath,
+          value: configuration,
+        }
+      : undefined,
   };
 }
 
-async function tryLoad<T>(file: string): Promise<T> {
-  const appConfigStats = await stat(file);
+async function tryLoad<T>(file: string): Promise<T | undefined> {
+  const exists = await access(file)
+    .then(() => true)
+    .catch(() => false);
 
-  if (!appConfigStats.isFile()) {
-    throw new Error(`No file: ${file}`);
+  if (!exists) {
+    return undefined;
   }
 
   const result = parse(await readFile(file, {encoding: 'utf8'}));
@@ -223,14 +194,6 @@ async function tryLoad<T>(file: string): Promise<T> {
 function validateAppConfig(
   value: Partial<LocalAppConfiguration>,
 ): asserts value is LocalAppConfiguration {
-  if (value.name == null) {
-    throw new Error('App config missing field `name`');
-  }
-
-  if (value.handle == null) {
-    throw new Error('App config missing field `handle`');
-  }
-
   return value as any;
 }
 
@@ -252,9 +215,13 @@ async function resolveExtensions(
       await Promise.all(
         directories.map(async (directory) => {
           try {
-            resolvedExtensions.push(
-              await loadExtensionFromDirectory(directory),
+            const resolvedExtension = await loadExtensionFromDirectory(
+              directory,
             );
+
+            if (resolvedExtension) {
+              resolvedExtensions.push(resolvedExtension);
+            }
           } catch (error) {
             loadErrors.push({directory, pattern});
           }
@@ -276,18 +243,20 @@ async function resolveExtensions(
 
 async function loadExtensionFromDirectory(
   directory: string,
-): Promise<LocalExtension> {
-  const configurationPath = path.resolve(directory, 'extension.toml');
+): Promise<LocalExtension | undefined> {
+  const configurationPath = path.resolve(directory, 'shopify.extension.toml');
   const configuration = await tryLoad<Partial<LocalExtensionConfiguration>>(
     configurationPath,
   );
+
+  if (configuration == null) return undefined;
 
   validateExtensionConfig(configuration);
 
   return {
     id:
       configuration.id ??
-      `gid://watch/LocalClipsExtension/${handleize(path.basename(directory))}`,
+      `gid://shopify/LocalExtension/${configuration.handle}`,
     name: configuration.name,
     handle: configuration.handle,
     root: directory,
@@ -322,8 +291,4 @@ function loadExtensionEntry(pattern: string): LocalExtensionEntry {
       {absolute: true},
     ),
   };
-}
-
-function handleize(value: string) {
-  return value.toLocaleLowerCase().replace(/[\s.-]+/g, '-');
 }
