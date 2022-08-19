@@ -11,6 +11,7 @@
   "sideEffects": false,
   "license": "MIT",
   "dependencies": {
+    "@babel/runtime": "^7.18.0",
     "@iarna/toml": "^2.2.0",
     "@lemonmade/graphql-live": "^0.1.10",
     "@quilted/http-handlers": "^0.2.43",
