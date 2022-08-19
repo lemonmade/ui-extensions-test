@@ -1,5 +1,11 @@
 # @shopilemon/cli
 
+## 0.1.3
+
+### Patch Changes
+
+- [`2f08833`](https://github.com/lemonmade/ui-extensions-test/commit/2f088336c999d1f5eac5a54dea08c6cd73a34954) Thanks [@lemonmade](https://github.com/lemonmade)! - Improve develop command
+
 ## 0.1.2
 
 ### Patch Changes
