@@ -46,8 +46,8 @@ export async function develop({ui}: {ui: Ui}) {
   if (app.extensions.length === 0) {
     ui.Heading('heads up!', {style: (content, style) => style.yellow(content)});
     ui.TextBlock(
-      `Your app doesn’t have any extensions to push yet. Run ${ui.Code(
-        'watchapp create extension',
+      `Your app doesn’t have any extensions to develop yet. Run ${ui.Code(
+        'yarn create @shopilemon extension',
       )} to get started!`,
     );
 
@@ -64,27 +64,65 @@ export async function develop({ui}: {ui: Ui}) {
 
     const localUrl = new URL(`http://localhost:${result.port}`);
 
-    // const localSocketUrl = new URL(`ws://localhost:${result.port}`);
-    // const targetUrl = watchUrl(`/app`);
-    // targetUrl.searchParams.set(
-    //   'connect',
-    //   new URL('/connect', localSocketUrl).href,
-    // );
-    const targetUrl = new URL(localUrl);
+    const hasMultipleExtensions = app.extensions.length > 1;
 
     ui.Heading('success!', {style: (content, style) => style.green(content)});
     ui.TextBlock(
       `We’ve started a development server at ${ui.Link(
         localUrl,
-      )}. In a moment, we’ll open ${ui.Link(
-        targetUrl,
-      )}, which will connect your local environment to the Watch app. All of the extensions in your local workspace will be automatically installed in all their supported extension points, so navigate to the page you are extending to see your extensions in action. Have fun building!`,
+      )}. You can press any of the following keys to interact with your ${
+        hasMultipleExtensions ? 'extensions' : 'extension'
+      }:`,
     );
 
-    await open(targetUrl.href);
+    ui.List(({Item}) => {
+      Item(`${ui.Code('enter')} to open the developer console in your browser`);
+      Item(
+        `${ui.Code('/')} or ${ui.Code('?')} to open ${
+          hasMultipleExtensions ? 'one of your extension’s' : 'your extension'
+        } in your browser`,
+      );
+      Item(`${ui.Code('esc')} to close the development server`);
+    });
+
+    ui.Spacer();
+
+    process.stdin.setRawMode(true);
+
+    for await (const data of on(process.stdin, 'data')) {
+      switch ((data as Buffer)[0]) {
+        case 3:
+        case 27: {
+          // Ctrl-C and Esc
+          process.exit(0);
+          return;
+        }
+        case 26: {
+          // Ctrl-Z
+          // I thought this would work, but it just hangs forever...
+          // process.kill(process.pid, 'SIGSTOP');
+          process.exit(0);
+          return;
+        }
+        case 10:
+        case 13: {
+          // Enter
+          open(localUrl.href);
+          break;
+        }
+        // /, ?, F, and f
+        case 47:
+        case 63:
+        case 70:
+        case 102: {
+          console.log('TODO: jump to extension');
+          break;
+        }
+      }
+    }
   } catch (error) {
     throw new PrintableError(
-      `There was a problem while trying to start your development server...`,
+      `There was a problem while running your development server...`,
       {original: error as any},
     );
   }

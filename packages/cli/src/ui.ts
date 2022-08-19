@@ -16,6 +16,7 @@ export interface Ui {
     content: string,
     props?: {spacing?: boolean; style?: StyleProp},
   ): void;
+  Spacer(): void;
   Text(
     content: string,
     props?: {style?: StyleProp; emphasized?: boolean},
@@ -71,6 +72,9 @@ export function createUi(): Ui {
 
   return {
     isInteractive,
+    Spacer() {
+      newline();
+    },
     Heading(content, {style} = {}) {
       newline();
 
